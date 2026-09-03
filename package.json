@@ -1,0 +1,14 @@
+{
+  "name": "opencode-chat",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "bun run dev:server & bun run dev:client & wait",
+    "dev:server": "bun --filter opencode-chat-server dev",
+    "dev:client": "bun --filter opencode-chat-client dev",
+    "typecheck": "bun --filter '*' typecheck"
+  }
+}
