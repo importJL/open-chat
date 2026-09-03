@@ -9,6 +9,10 @@
     "dev": "bun run dev:server & bun run dev:client & wait",
     "dev:server": "bun --filter opencode-chat-server dev",
     "dev:client": "bun --filter opencode-chat-client dev",
+    "build": "bun run build:client && bun run build:server",
+    "build:client": "bun --filter opencode-chat-client build",
+    "build:server": "bun --filter opencode-chat-server build",
+    "start:prod": "bun --filter opencode-chat-server start:prod",
     "typecheck": "bun --filter '*' typecheck"
   }
 }

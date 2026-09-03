@@ -1,4 +1,4 @@
-# opencode chat
+# open chat
 
 A minimal inference demo: a [Bun](https://bun.sh) server that wraps the
 [opencode](https://opencode.ai) [JS SDK](https://opencode.ai/docs/sdk/), plus a
@@ -33,9 +33,33 @@ bun run dev
 
 Optionally override with env vars:
 
+- `OPENCODE_HOST` (default `127.0.0.1`) — embedded opencode server host
 - `PORT` (default `3000`) — Bun API server port
 - `OPENCODE_PORT` (default `4097`) — embedded opencode server port
 - `MODEL` (e.g. `opencode-go/deepseek-v4-flash`) — force a default model
+
+## Build for production
+
+Build both deployable outputs from the workspace root:
+
+```bash
+bun run build
+```
+
+This runs the Vite client build and bundles the Bun server with `bun build`:
+
+- `client/dist/` — static frontend assets for a web server or CDN
+- `server/dist/index.js` — bundled Bun API server
+
+Run the bundled API server with:
+
+```bash
+bun run start:prod
+```
+
+The frontend is not served by the API process. Configure the static host to
+forward `/api/*` and `/api/events` to the running Bun server, or use the Vite
+proxy during local development.
 
 ## Layout
 
