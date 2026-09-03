@@ -3,7 +3,20 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import rehypeHighlight from "rehype-highlight"
 import type { Components } from "react-markdown"
+import type { ReactNode } from "react"
 import { stripThinking } from "../text"
+import { CopyButton } from "./CopyButton"
+
+function childText(children: ReactNode): string {
+  if (children == null || typeof children === "boolean") return ""
+  if (typeof children === "string" || typeof children === "number") return String(children)
+  if (Array.isArray(children)) return children.map(childText).join("")
+  const el = children as React.ReactElement<{ children?: ReactNode }>
+  if (el && typeof el === "object" && el.props) {
+    return childText(el.props.children)
+  }
+  return ""
+}
 
 const Code = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   const isBlock = className?.includes("language-")
@@ -52,25 +65,34 @@ const components: Components = {
     const { className, children } = props as { className?: string; children?: React.ReactNode }
     return <Code className={className}>{children}</Code>
   },
-  pre: ({ children }) => (
-    <Box
-      component="pre"
-      sx={{
-        my: 1,
-        p: 1.25,
-        borderRadius: 1,
-        bgcolor: "background.default",
-        border: 1,
-        borderColor: "divider",
-        overflowX: "auto",
-        fontSize: "0.8rem",
-        lineHeight: 1.5,
-        "& code": { fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" },
-      }}
-    >
-      {children}
-    </Box>
-  ),
+  pre: ({ children }) => {
+    const code = childText(children)
+    return (
+      <Box sx={{ position: "relative", my: 1 }}>
+        <Box
+          component="pre"
+          sx={{
+            p: 1.25,
+            borderRadius: 1,
+            bgcolor: "background.default",
+            border: 1,
+            borderColor: "divider",
+            overflowX: "auto",
+            fontSize: "0.8rem",
+            lineHeight: 1.5,
+            "& code": { fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" },
+          }}
+        >
+          {children}
+        </Box>
+        {code && (
+          <Box sx={{ position: "absolute", top: 4, right: 4 }}>
+            <CopyButton text={code} label="Copy code" />
+          </Box>
+        )}
+      </Box>
+    )
+  },
   blockquote: ({ children }) => (
     <Box
       component="blockquote"

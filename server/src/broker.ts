@@ -68,3 +68,8 @@ export function replay(sid: string, afterSeq: number): Buffered[] {
   if (!buf) return []
   return buf.filter((b) => b.seq > afterSeq)
 }
+
+export function clearSession(sid: string): void {
+  buffers.delete(sid)
+  listeners.delete(sid)
+}

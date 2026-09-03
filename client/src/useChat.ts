@@ -294,6 +294,12 @@ export function useChat() {
     dispatch({ kind: "session_reset" })
   }, [])
 
+  const switchSession = useCallback((id: string) => {
+    sessionStorage.setItem(STORAGE_KEY, id)
+    setSessionId(id)
+    dispatch({ kind: "session_reset" })
+  }, [])
+
   const clearError = useCallback(() => dispatch({ kind: "clear_error" }), [])
 
   return {
@@ -304,6 +310,7 @@ export function useChat() {
     send,
     stop,
     newChat,
+    switchSession,
     clearError,
   }
 }

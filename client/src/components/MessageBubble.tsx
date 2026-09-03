@@ -13,6 +13,7 @@ import ExpandLess from "@mui/icons-material/ExpandLess"
 import ExpandMore from "@mui/icons-material/ExpandMore"
 import type { ChatMessage } from "../useChat"
 import { MarkdownAnswer } from "./MarkdownAnswer"
+import { CopyButton } from "./CopyButton"
 
 function ThinkingCard({ reasoning }: { reasoning: string }) {
   const [open, setOpen] = useState(false)
@@ -128,6 +129,11 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
           >
             {message.model}
           </Typography>
+        )}
+        {rawText && (
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5, mr: -1.25 }}>
+            <CopyButton text={rawText} label="Copy response" />
+          </Box>
         )}
       </Paper>
     </Box>

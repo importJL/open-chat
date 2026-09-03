@@ -31,6 +31,25 @@ export type HistoryMessage = {
   parts: Array<{ id: string; type: "text" | "reasoning"; text: string }>
 }
 
+export type SessionInfo = {
+  id: string
+  title: string
+  time: { created: number; updated: number }
+}
+
+export async function listSessions(): Promise<SessionInfo[]> {
+  const res = await fetch("/api/sessions")
+  if (!res.ok) throw await parseError(res, `sessions request failed: ${res.status}`)
+  return res.json()
+}
+
+export async function deleteSession(sessionID: string): Promise<void> {
+  const res = await fetch(`/api/sessions/${encodeURIComponent(sessionID)}`, {
+    method: "DELETE",
+  })
+  if (!res.ok) throw await parseError(res, `delete session failed: ${res.status}`)
+}
+
 export async function getMessages(sessionID: string): Promise<HistoryMessage[]> {
   const res = await fetch(`/api/sessions/${encodeURIComponent(sessionID)}/messages`)
   if (!res.ok) throw await parseError(res, `history request failed: ${res.status}`)

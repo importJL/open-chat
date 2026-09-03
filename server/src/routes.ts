@@ -1,6 +1,6 @@
 import type { OpencodeClient } from "@opencode-ai/sdk"
 import { CHAT_AGENT, DENIED_TOOLS } from "./agent"
-import { subscribe, replay } from "./broker"
+import { subscribe, replay, clearSession } from "./broker"
 import { SSEStream, sseResponse } from "./sse"
 import { toWire } from "./wire"
 
@@ -12,13 +12,10 @@ function fail(message: string, status: number): Response {
   return json({ error: message }, status)
 }
 
-function responseError(res: {
-  response?: { status?: number }
-  error?: { name?: string; message?: string; data?: unknown }
-}): Response {
+function responseError(res: { response?: { status?: number }; error?: unknown }): Response {
   const status = res.response?.status ?? 500
-  const data = (res.error?.data ?? {}) as { message?: string }
-  const message = data?.message ?? res.error?.message ?? res.error?.name ?? "Unknown error"
+  const err = res.error as { name?: string; message?: string; data?: { message?: string } } | undefined
+  const message = err?.data?.message ?? err?.message ?? err?.name ?? "Unknown error"
   return fail(message, status)
 }
 
@@ -130,6 +127,26 @@ export function registerRoutes(client: OpencodeClient, baseUrl: string, cliVersi
         const res = await client.session.create({ body: { title: title || "New chat" } })
         if (res.error) return responseError(res)
         return json({ id: (res.data as { id: string }).id }, 201)
+      },
+      GET: async (): Promise<Response> => {
+        const res = await client.session.list()
+        if (res.error) return responseError(res)
+        const sessions = (res.data ?? []).map((s) => ({
+          id: s.id,
+          title: s.title,
+          time: { created: s.time.created, updated: s.time.updated },
+        }))
+        return json(sessions)
+      },
+    },
+
+    "/api/sessions/:id": {
+      DELETE: async (req: RouteRequest): Promise<Response> => {
+        const id = req.params.id
+        const res = await client.session.delete({ path: { id } })
+        if (res.error) return responseError(res)
+        clearSession(id)
+        return json({ ok: true })
       },
     },
 
